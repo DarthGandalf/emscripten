@@ -3,6 +3,7 @@
 #include <semaphore.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include "pthread_impl.h"
 
 int emscripten_has_threading_support() { return 0; }
 
@@ -183,8 +184,13 @@ int pthread_detach(pthread_t t) {
   return 0;
 }
 
-int emscripten_main_browser_thread_id() {
-  return (int)pthread_self();
+static struct pthread __main_pthread;
+pthread_t __pthread_self(void) {
+  return &__main_pthread;
+}
+
+pthread_t emscripten_main_browser_thread_id() {
+  return pthread_self();
 }
 
 // pthread_equal is defined as a macro in C, as a function for C++; undef it
